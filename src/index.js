@@ -29,65 +29,60 @@ function toggleComplete(id) {
   updateTodos(updateTodoList);
 }
 
-const removeCompleted = () => {
+const removeItems = (type, id) => {
   const todoListArr = JSON.parse(localStorage.getItem('todos') || '[]');
-  const updateList = todoListArr.filter((todo) => todo.completed !== true);
+
+  let updateList;
+  if (type === 'completed') {
+    updateList = todoListArr.filter((todo) => todo.completed !== true);
+  } else if (type === 'todo') {
+    updateList = todoListArr.filter((todo) => todo.id !== id);
+  } else {
+    // handle invalid type
+    return;
+  }
+
   updateTodos(updateList);
 };
 
-const removeTodo = (targetIndex) => {
-  const todoListArr = JSON.parse(localStorage.getItem('todos') || '[]');
-  const updateList = todoListArr.filter((todo) => todo.id !== parseInt(targetIndex, 10));
-  updateTodos(updateList);
+const removeCompleted = () => {
+  removeItems('completed');
 };
 
 function updateList(todos) {
-  const description = todos.map((todo) => `
+  const description = todos
+    .map(
+      (todo) => `
             <li class="card todo-list-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
               <input type="checkbox" ${todo.completed ? 'checked' : ''} class="checkbox"/>
               <input type="text" value="${todo.description}" class="inputtext" id="${todo.id}"/>
               <button type="button">🗑</button>
             </li>
-          `).join('');
+          `
+    )
+    .join('');
 
   todoList.innerHTML = description;
-  const inputTexts = todoList.querySelectorAll('.todo-list-item input[type=text]');
 
-  inputTexts.forEach((input) => input.addEventListener('change', (e) => updateInputText(input.id, e.target.value)));
+  function attachEventListeners(selector, callback) {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach((element) => callback(element));
+  }
 
-  const deleteButtons = todoList.querySelectorAll('.todo-list-item button');
+  attachEventListeners('.todo-list-item input[type=text]', (input) => {
+    input.addEventListener('change', (e) => updateInputText(input.id, e.target.value));
+  });
 
-  deleteButtons.forEach((button) => button.addEventListener('click', () => removeTodo(button.parentNode.getAttribute('data-id'))));
+  attachEventListeners('.todo-list-item button', (button) => {
+    button.addEventListener('click', () => removeItems('todo', button.parentNode.getAttribute('data-id')));
+  });
 
-  const completedCheckboxes = todoList.querySelectorAll('.checkbox');
-  completedCheckboxes.forEach((checkbox) => checkbox.addEventListener('click', () => toggleComplete(checkbox.parentNode.getAttribute('data-id'))));
-}
-
-function newTodo(e) {
-  e.preventDefault();
-  const newTask = document.getElementById('new-task').value;
-  const todos = JSON.parse(localStorage.getItem('todos') || '[]');
-
-  const newTodo = {
-    description: newTask,
-    completed: false,
-    id: todos[todos.length - 1] ? todos[todos.length - 1].id + 1 : todos.length + 1,
-  };
-
-  document.getElementById('new-task').value = '';
-  const updatedTodos = [...todos, newTodo];
-  localStorage.setItem('todos', JSON.stringify(updatedTodos));
-  updateList(updatedTodos);
-}
-
-function init() {
-  newTodoForm.addEventListener('submit', newTodo);
-  const todos = JSON.parse(localStorage.getItem('todos') || '[]');
-  updateList(todos);
-}
-
-clear.addEventListener('click', () => {
-  removeCompleted();
-});
-
-init();
+  attachEventListeners('.checkbox', (checkbox) => {
+    checkbox.addEventListener('change', () => {
+      toggleComplete(checkbox.parentNode.getAttribute('data-id'));
+    });
+  });
+  const completedCheckboxes = todoList.querySelectorAll('.todo-list-item input[type=checkbox]');
+  completedCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener('click', () => toggleComplete(checkbox.parentNode.getAttribute('data-id')));
+  });

@@ -1,10 +1,7 @@
 const todoList = document.querySelector('.todo-list');
 
 export default function updateTodos(newTodos) {
-  const updatedTodos = [];
-  for (let i = 0; i < newTodos.length; i += 1) {
-    updatedTodos.push({ ...newTodos[i], id: i + 1 });
-  }
+  const updatedTodos = newTodos.map((todo, index) => ({ ...todo, id: index + 1 }));
 
   localStorage.setItem('todos', JSON.stringify(updatedTodos));
 
