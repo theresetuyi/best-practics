@@ -1,8 +1,10 @@
 import './style.css';
 import updateTodos from './modules/interactive.js';
 
+// eslint-disable-next-line no-unused-vars
 const newTodoForm = document.querySelector('#new-todo-form');
 const todoList = document.querySelector('.todo-list');
+// eslint-disable-next-line no-unused-vars
 const clear = document.querySelector('.clearComplete');
 
 function updateInputText(id, newText) {
@@ -25,7 +27,6 @@ function toggleComplete(id) {
     }
     return todo;
   });
-
   updateTodos(updateTodoList);
 }
 
@@ -45,10 +46,12 @@ const removeItems = (type, id) => {
   updateTodos(updateList);
 };
 
+// eslint-disable-next-line no-unused-vars
 const removeCompleted = () => {
   removeItems('completed');
 };
 
+// eslint-disable-next-line no-unused-vars
 function updateList(todos) {
   const description = todos
     .map(
@@ -58,7 +61,7 @@ function updateList(todos) {
               <input type="text" value="${todo.description}" class="inputtext" id="${todo.id}"/>
               <button type="button">🗑</button>
             </li>
-          `
+          `,
     )
     .join('');
 
@@ -69,7 +72,7 @@ function updateList(todos) {
     elements.forEach((element) => callback(element));
   }
 
-  attachEventListeners('.todo-list-item input[type=text]', (input) => {
+  attachEventListeners('.todo-list-item input[type="text"]', (input) => {
     input.addEventListener('change', (e) => updateInputText(input.id, e.target.value));
   });
 
@@ -82,7 +85,8 @@ function updateList(todos) {
       toggleComplete(checkbox.parentNode.getAttribute('data-id'));
     });
   });
-  const completedCheckboxes = todoList.querySelectorAll('.todo-list-item input[type=checkbox]');
-  completedCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener('click', () => toggleComplete(checkbox.parentNode.getAttribute('data-id')));
-  });
+}
+const completedCheckboxes = todoList.querySelectorAll('.todo-list-item input[type="checkbox"]');
+completedCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener('click', () => toggleComplete(checkbox.parentNode.getAttribute('data-id')));
+});
